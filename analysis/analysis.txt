@@ -1,22 +1,92 @@
-Your name
-Your netid
+Anna Diemel
+ad356
 
-Copy/Paste results from PercolationStats using PercolationDFS
+Using PercolationDFSFast:
+
+simulation data for 20 trials
+grid	mean	stddev	time
+100		0.593	0.014	0.140
+200		0.591	0.010	0.191
+400		0.590	0.006	0.855
+800		0.594	0.004	5.354
+And then a StackOverflowError was output to the console.
+
+Using PercolationBFS:
+
+simulation data for 20 trials
+grid	mean	stddev	time
+100		0.593	0.014	0.131
+200		0.591	0.010	0.186
+400		0.590	0.006	0.876
+800		0.594	0.004	5.281
+1600	0.592	0.002	28.835
+3200	0.593	0.001	183.862
 
 
-Copy/Paste results from PercolationStats using PercolationDFSFast
+Using PercolationUF with the QuickUWPC UnionFind implementation:
 
+simulation data for 20 trials
+grid	mean	stddev	time
+100		0.593	0.014	0.078
+200		0.591	0.010	0.134
+400		0.590	0.006	0.747
+800		0.594	0.004	4.169
+1600	0.592	0.002	19.455
+3200	0.593	0.001	97.730
 
-Copy/Paste results from PercolationStats using PercolationBFS
+1. How does doubling the grid size affect running time (keeping # trials fixed)?
 
+	Examining the difference between a grid size of 1600 and 3200, since a larger size will have a runtime
+most dependent on grid size/ big-Oh complexity and less dependent on computer function, this roughly quintuples
+the running time of PercolationUF. To be precise, the jump from 1600 to 3200 is 5.02 times as large, and from 800 to
+1600 is 4.667 times as large.
 
-Copy/Paste results from PercolationStats using PercolationUF 
-with the QuickUWPC UnionFind implementation.
+2. How does doubling the number of trials affect running time?
 
-1. How does doubling the grid size affect running time (keeping # trials fixed)
+	Conceptually, doubling the number of trials should duble the running time, because this does not change the
+complexity of the commands being carried out. Rather, it only changes the number of times it is done, so the 
+runtime should be multiplied by two if doubling. This can be verified experimentally by running PercolationStats
+for PercolationUF using half as many (10) trials. The data from this is below, with two additional columns added
+to show the relation between this data and that of 20 trials.
 
+simulation data for 10 trials
+grid	mean	stddev	time	time 20	ratio of 20:10
+100		0.593	0.019	0.045	0.078	1.733
+200		0.596	0.006	0.093	0.134	1.44
+400		0.592	0.006	0.417	0.747	1.791
+800		0.592	0.003	2.044	4.169	2.040
+1600	0.594	0.002	10.234	19.455	1.901
+3200	0.593	0.001	49.093	97.930	1.995
 
-2. How does doubling the number of trials affect running time.
-
+It is easy to see from this the linear relationship between the number of trials and running time. The clearer
+relationship displayed in higher grid sizes is due to their running times' weaker dependence on computer 
+functioning and higher dependence on grid size.
 
 3. Estimate the largest grid size you can run in 24 hours with 20 trials. Explain your reasoning.
+
+	To do 20 trials, the largest amount of time each trial could take is 1.2 hours, which is equivalent to
+72 minutes or 4320 seconds. Using the logic from question one that doubling the grid size multiplies the runtime
+by about 5 and the runtime of 97.930s for a grid size of 3200, we can set up the equation 4320 = 97.93 * 5^n to find 
+the largest multiple of 3200 that is smaller than the largest possible grid size within the parameter.
+This can be rewritten as 5^n = 44.113, and it is clear from this that n = log base 5(44.113) = 2.352. So, 3200
+could be doubled no more than twice, and would leave some change over. This would mean that a grid size of 
+12800 would have a runtime of 97.93(25)= 2448.25 s. There's clearly leftover change, so we will use the same process
+to add multiples of the 1600 runtime, and then multiples of the 800 runtime to this, and so on. This process is as follows:
+
+(19.455)5^n = (4320-2448.25)
+log base 5 (96.209) = 2.83 -> 12800 + 2(1600) = size of 16000 
+	and a time of 2448.25 + 25(19.455) = 2934.625 s
+
+(4.169)5^n = (4320-2934.625)
+log base 5 (332.304) = 3.602 -> 16000 + 3(800) = size of 18400
+	and a time of 2934.625 + 125(4.169) = 3455.75 s
+
+(0.747)5^n = (4320-3455.75)
+log base 5 (1156.961) = 4.383 -> 18400 + 4(400) = size of 20000
+	and a time of 3455.75 + 625(.747) = 3922.625 s 
+
+(0.134)5^n = (4320-3455.75)
+log base 5 (2965.485) = 4.967
+	This is incredibly close to 5, so for estimation's sake the maximum grid size attainable will be 20000 + 5(200) = 21000 cells.
+Simply put, extrapolation using what we know about the doubling of cell size and its effect on runtime from the largest
+grid sizes to the smallest can be used to estimate this problem.
